@@ -38,6 +38,42 @@ class Color {                                               // my custom color c
   }
 };
 
+class Bar {
+  public:
+  int startIdx, endIdx, value;
+  bool flipped;
+  Bar() : startIdx(0), endIdx(0), value(0),  flipped(false) {}
+  Bar(int si, int ei, int v, bool f) : startIdx(si), endIdx(ei), flipped(f) {}
+
+  void setValue(v) {
+    if (v > value) value = v;
+  }
+
+  void draw(Color col) {
+    drawFrequencyBar(startIdx, endIdx, flipped, col);
+  }
+  
+  void tick() {
+    if (value > 0) value--;
+  }
+};
+
+void drawFrequencyBar(int pos, int height, bool flip, Color col) {  // function to draw a frequency bar at a led index. height: 0-16.
+  assignLEDRange(pos, pos+16, Color(0,0,0));                        // clear colors at on the frequency bar range.
+  if (flip) {                                                       // since the matrix is wired in a snaking pattern up the display, some bars need to be flipped, displaying values from top to bottom.
+    for (int i = height-1; i >= 0; i--) {                           // backwards for loop, assigns leds down the bar based on the height value.
+      int led = (pos+15)-i;
+      assignLED(led, col);
+    }
+  }
+  else {                                                            // otherwise, the bar is right-side up, and the values fill from bottom to top.
+    for (int i = 0; i < height; i++) {                              // forwards for loop, assigns leds up the bar based on the height value.
+      int led = i+pos;
+      assignLED(led, col);
+    }
+  }
+}
+
 void setup() {                                                   // runs once once the program is loaded.
   Serial.begin(9600);                                            // serial communication to the computer for debugging.
   sampling_period_us = round(1000000 * (1.0 / samplingFreq));    // calculate our sampling period (in microseconds) based on our sampling frequency.
@@ -61,26 +97,9 @@ void display() {   // shorthand function for updating the LED matrix.
   FastLED.show();  // built in FastLED library function to send the buffer data to the display.
 }
 
-void drawFrequencyBar(int pos, int height, bool flip, Color col) {  // function to draw a frequency bar at a led index. height: 0-16.
-  assignLEDRange(pos, pos+16, Color(0,0,0));                        // clear colors at on the frequency bar range.
-  if (flip) {                                                       // since the matrix is wired in a snaking pattern up the display, some bars need to be flipped, displaying values from top to bottom.
-    for (int i = height-1; i >= 0; i--) {                           // backwards for loop, assigns leds down the bar based on the height value.
-      int led = (pos+15)-i;
-      assignLED(led, col);
-    }
-  }
-  else {                                                            // otherwise, the bar is right-side up, and the values fill from bottom to top.
-    for (int i = 0; i < height; i++) {                              // forwards for loop, assigns leds up the bar based on the height value.
-      int led = i+pos;
-      assignLED(led, col);
-    }
-  }
-}
-
 // ----------------------------------------------- MAIN LOOP AND AUDIO PROCESSING ----------------------------------------------- //
 
-void loop() {                                                 // while the arduino is powered on
-
+void loop() {        // while the arduino is powered on
   for (int i = 0; i < samples; i++) {                         // for loop to sample the mic data for a certain amount of microseconds.
     microseconds = micros();                                  // store the initial microsecond value at the current tick.
     vReal[i] = analogRead(MIC_PIN);                           // read the analog voltage data from the microphone pin.

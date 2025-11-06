@@ -1,17 +1,12 @@
-// SimpleRx - the slave or the receiver
-
+// ONLY THE RADIO RECIEVER CODE FOR THE MAIN ANALYZER (BY CAM)
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-
 #define CE_PIN   9
 #define CSN_PIN 10
-
 const byte thisSlaveAddress[5] = {'R','x','A','A','A'};
-
 RF24 radio(CE_PIN, CSN_PIN);
-
-char dataReceived[10]; // this must match dataToSend in the TX
+char dataReceived[1]; // this must match dataToSend in the TX
 bool newData = false;
 
 //===========
@@ -30,8 +25,8 @@ void setup() {
 //=============
 
 void loop() {
-    getData();
-    showData();
+  getData();
+  showData();
 }
 
 //==============

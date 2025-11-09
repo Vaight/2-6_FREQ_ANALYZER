@@ -71,11 +71,15 @@ class Bar {
   }
 };
 
+Bar bars[16];
+
 void setup() {                                                   // runs once once the program is loaded.
-  Serial.begin(9600);                                            // serial communication to the computer for debugging.
   sampling_period_us = round(1000000 * (1.0 / samplingFreq));    // calculate our sampling period (in microseconds) based on our sampling frequency.
   pinMode(MIC_PIN, INPUT);                                       // set our mic input pin to input. 
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);         // initialize the LED display with the WS2812 protocol.
+  for (int b=0; b<16; b++) {
+    bars[b] = Bar(0+16*i, 16+16*i);
+  }
 }
 
 void assignLED(int idx, Color col) {         // custom function to assign a color object to a LED index on the matrix. (will probably replace this with an x,y system later for less math elsewhere).
@@ -84,7 +88,7 @@ void assignLED(int idx, Color col) {         // custom function to assign a colo
   }
 }
 
-void assignLEDRange(int idx1, int idx2, Color col) {                           // very similar to the above function, but can draw LEDs in a range between index 1 and index 2.
+void assignLEDRange(int idx1, int idx2, Color col) {                          // very similar to the above function, but can draw LEDs in a range between index 1 and index 2.
   if (idx1 <= NUM_LEDS && idx2 <= NUM_LEDS && col.isValid()) {                // if indexes are within LED matrix boundary.
     for (int i = idx1; i <= idx2; i++) leds[i] = CRGB(col.r, col.g, col.b);   // set the values on that range to the specified color.
   }
@@ -107,7 +111,6 @@ void loop() {        // while the arduino is powered on
   FFT.windowing(FFTWindow::Hamming, FFTDirection::Forward);   // from arduinoFFT wiki, weigh the data by windowing it.
   FFT.compute(FFTDirection::Forward);                         // from arduinoFFT wiki, actually compute the FFT.
   FFT.complexToMagnitude();                                   // from arduinoFFT wiki, convert the vImag (y-axis) into magnitudes for the frequency bands.
-  //float xDom = FFT.majorPeak();                             // from arduinoFFT wiki, this value contains the most dominant frequency in the spectrum. Not using this at the moment.
 
   int bins_per_column = (samples / 2) / 16;                   // 64 / 16 = 4 bins per column for 16 columns. used to round 64 bands into our 16 columns.
   for (int col = 1; col <= 16; col++) {                       // loop over the columns, all 16 of them.
@@ -121,13 +124,11 @@ void loop() {        // while the arduino is powered on
     level = constrain(level, 0, 16);                          // constrain the max value to 16, so it doesn't go off our display.
 
     int i = col-1;                                            // set the indexer to the current column-1 since i'm lazy
-    Serial.print(level);                                      // add the level for the col to the serial display
-    bool flipPar = true;                                      // default to a flipped bar
-    if (i%2) flipPar = false;                                 // if there is an even column, flip the bar to false
+    bool flipBar = true;                                      // default to a flipped bar
+    if (i%2) flipBar = false;                                 // if there is an even column, flip the bar to false
     Color bGrad = Color(0, 0+(16*i), 255-(16*i));             // compute a gradient based on the index value
     bGrad.setBrightness(5);                                   // set the color brightness 
-    drawFrequencyBar(16*i, level, flipPar, bGrad);            // draw the bar
-    Serial.print(" ");                                        // space between chars
+    drawFrequencyBar(16*i, level, flipBar, bGrad);            // draw the bar
   }
   display(); // update display
 }

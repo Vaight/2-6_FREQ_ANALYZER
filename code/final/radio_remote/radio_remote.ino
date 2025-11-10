@@ -15,6 +15,7 @@
 int prvBtnSt[] = {0, 0, 0, 0};                         // Previous button states at the current tick
 int curBtnSt[] = {0, 0, 0, 0};                         // Current button states at the current tick
 const byte slaveAddress[5] = {'R','x','A','A','A'};    // The address for the radio transciever board
+char msg[1] = "0";
 RF24 radio(CE_PIN, CSN_PIN);                           // Initialize the radio object
 
 void setup() {
@@ -39,10 +40,10 @@ void loop() {
   if (digitalRead(BTN_SUP_PIN) == LOW) curBtnSt[2] = 1; else curBtnSt[2] = 0;
   if (digitalRead(BTN_SDN_PIN) == LOW) curBtnSt[3] = 1; else curBtnSt[3] = 0;
   // Process button inputs for sending instructions via RF
-  if (btnJustPressed(0)) send({"0"});
-  else if (btnJustPressed(1)) send({"1"});
-  else if (btnJustPressed(2)) send({"2"});
-  else if (btnJustPressed(3)) send({"3"});
+  if (btnJustPressed(0)) setAndSend('0');
+  else if (btnJustPressed(1)) setAndSend('1');
+  else if (btnJustPressed(2)) setAndSend('2');
+  else if (btnJustPressed(3)) setAndSend('3');
   // Set previous button state array so we can check if a button is 'just' pressed.
   for (int i=0; i<4; i++) prvBtnSt[i] = curBtnSt[i];
 }
@@ -67,7 +68,12 @@ void flashSigLED(bool sucess) {  // flashes the signal LED (yellow) on the board
   }
 }
 
-void send(char msg[]) {
+void setAndSend(char m) {
+  msg[0] = m;
+  send();
+}
+
+void send() {
   bool result = radio.write(&msg, sizeof(msg));
   if (result) flashSigLED(true);
   else flashSigLED(false);

@@ -54,13 +54,12 @@ void drawFrequencyBar(int pos, int height, bool flip, Color col) {  // function 
   }
 }
 
-
 class Bar {
   public:
   int startIdx, endIdx, value;
   bool flipped;
   Bar() : startIdx(0), endIdx(0), value(0),  flipped(false) {}
-  Bar(int si, int ei, int v, bool f) : startIdx(si), endIdx(ei), flipped(f) {}
+  Bar(int si, int ei, bool f) : startIdx(si), endIdx(ei), flipped(f) {}
 
   void draw(Color col) {
     drawFrequencyBar(startIdx, endIdx, flipped, col);
@@ -107,8 +106,7 @@ void loop() {        // while the arduino is powered on
   FFT.windowing(FFTWindow::Hamming, FFTDirection::Forward);   // from arduinoFFT wiki, weigh the data by windowing it.
   FFT.compute(FFTDirection::Forward);                         // from arduinoFFT wiki, actually compute the FFT.
   FFT.complexToMagnitude();                                   // from arduinoFFT wiki, convert the vImag (y-axis) into magnitudes for the frequency bands.
-  //float xDom = FFT.majorPeak();                             // from arduinoFFT wiki, this value contains the most dominant frequency in the spectrum. Not using this at the moment.
-
+  
   int bins_per_column = (samples / 2) / 16;                   // 64 / 16 = 4 bins per column for 16 columns. used to round 64 bands into our 16 columns.
   for (int col = 1; col <= 16; col++) {                       // loop over the columns, all 16 of them.
     double avg = 0;                                           // define a variable to hold our averaged value.

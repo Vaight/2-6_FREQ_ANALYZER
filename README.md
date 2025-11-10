@@ -1,4 +1,4 @@
-![2-6 logo](https://github.com/Vaight/2-6_FREQ_ANALYZER/tree/main/media/twosix.png?raw=true)
+![2-6-logo](Media/twosix.png)
 
 # FREQUENCY ANALYZER
 An Arduino based frequency spectrum analyzer. (Created as a university project)

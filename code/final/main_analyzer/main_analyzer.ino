@@ -155,6 +155,7 @@ void loop() {        // while the arduino is powered on
 
   getData();
   processData();
+  if (modeSt > 2) modeSt = 1;
 
   if (modeSt == 1) {
     for (int i = 0; i < samples; i++) {                         // for loop to sample the mic data for a certain amount of microseconds.
@@ -200,7 +201,7 @@ void loop() {        // while the arduino is powered on
     if (level < 7) statusCol = Color(255,50,0);
     else if (level >= 7 && level < 10) statusCol = Color(255,20,0);
     else if (level >= 15) {
-      for (int i=0; i<6; i++) {
+      for (int i=0; i<2; i++) {
         assignLEDRange(0, 255, Color(100,0,0));
         display();
         delay(50);
@@ -244,7 +245,6 @@ void processData() {
     } else if (dataReceived[0] == '1') {
       if (modeSt == 0) modeSt = 1;
       else if (modeSt < 3) modeSt += 1;
-      else modeSt = 1;
     } else if (dataReceived[0] == '2') {
       thresholdSt += 8;
     } else if (dataReceived[0] == '3') {

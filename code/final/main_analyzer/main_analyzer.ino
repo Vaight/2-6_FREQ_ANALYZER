@@ -7,8 +7,8 @@
 #define LED_PIN   7
 #define MIC_PIN   A0
 #define NUM_LEDS  256
-#define CE_PIN   9
-#define CSN_PIN 10
+#define CE_PIN    9
+#define CSN_PIN   10
 
 const byte thisSlaveAddress[5] = {'R','x','A','A','A'};
 RF24 radio(CE_PIN, CSN_PIN);
@@ -30,7 +30,7 @@ CRGB leds[NUM_LEDS]; // initialize the LED display's color array
 
 // the following variables store settings that can be changed via the remote.
 
-bool tickingSt = true;
+bool tickingSt = false;
 int thresholdSt = 64; // 16 is default
 int modeSt = 1;          // 0= standby state,   1= frequency analyze state,   2= noise monitoring state
 
@@ -183,7 +183,7 @@ void loop() {        // while the arduino is powered on
       int i = col-1;                                            // set the indexer to the current column-1 since i'm lazy
       bool flipPar = true;                                      // default to a flipped bar
       if (i%2) flipPar = false;                                 // if there is an even column, flip the bar to false
-      Color bGrad = Color(0+(16*i), 255-(16*i), 0);             // compute a gradient based on the index value
+      Color bGrad = Color(0+(16*i), 0, 255-(16*i));             // compute a gradient based on the index value
       bGrad.setBrightness(4);                                   // set the color brightness 
       bars[i].setValue(level);
       bars[i].draw(bGrad);
@@ -220,7 +220,7 @@ void loop() {        // while the arduino is powered on
     }
     tickAllBars();
     display();
-    delay(20);
+    delay(10);
   }
 }
 
@@ -246,9 +246,9 @@ void processData() {
       if (modeSt == 0) modeSt = 1;
       else if (modeSt < 3) modeSt += 1;
     } else if (dataReceived[0] == '2') {
-      thresholdSt += 8;
+      thresholdSt += 4;
     } else if (dataReceived[0] == '3') {
-      thresholdSt -= 8;
+      thresholdSt -= 4;
     }
   }
   newData = false;

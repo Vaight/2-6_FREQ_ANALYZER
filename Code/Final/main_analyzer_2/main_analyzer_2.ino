@@ -171,12 +171,25 @@ void loop() {        // while the arduino is powered on
 
     int avgd[16];
     int bins_per_column = 4;
-    for (int col = 1; col <= 16; col++) {                       // loop over the columns, all 16 of them.
+    for (int fr = 0; fr < samples; fr++) {                    // loop over the columns, all 16 of them.
       double avg = 0;                                           // define a variable to hold our averaged value.
       for (int i = 0; i < bins_per_column; i++) {               // add the values of the 4 bands to 1 average
-        int bin = col * bins_per_column + i;
+        int bin = fr * bins_per_column + i;
         avg += vReal[bin];
       }
+      if (fr%4 == 0) avgd[fr/4] = avg;
+    }
+
+    for (int b = 0; b<16; b++) {
+      bool flipPar = true;                                      // default to a flipped bar
+      if (b%2) flipPar = false;                                 // if there is an even column, flip the bar to false
+      Color bGrad = Color(0+(16*b), 0, 255-(16*b));             // compute a gradient based on the index value
+      bGrad.setBrightness(4);                                   // set the color brightness 
+      bars[b].setValue(avgd[b]);
+      bars[b].draw(bGrad);
+    }
+
+    /*
       avg /= bins_per_column;                                   // divide average over the range.
       int level = map(avg, 0, 100, 0, thresholdSt);             // map the 0-100 range to a 0-max range, basically dividing the range.
       level = constrain(level, 0, 15);                          // constrain the max value to 16, so it doesn't go off our display.
@@ -191,6 +204,7 @@ void loop() {        // while the arduino is powered on
     }
     tickAllBars();
     display(); // update display
+    */
   }
   
   else if (modeSt == 2) {

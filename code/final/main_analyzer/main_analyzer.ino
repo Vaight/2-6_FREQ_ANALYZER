@@ -194,14 +194,12 @@ void loop() {        // while the arduino is powered on
   }
   
   else if (modeSt == 2) {
-    Color statusCol = Color(255,0,0);
     int level = analogRead(MIC_PIN);
     level = map(level, 300, 500, 0, 16+thresholdSt);
     level = constrain(level, 0, 16);
+    Color statusCol = Color(0+(16*level),255-(16*level),0);
     
-    if (level < 7) statusCol = Color(255,50,0);
-    else if (level >= 7 && level < 10) statusCol = Color(255,20,0);
-    else if (level >= 15) {
+    if (level >= 15) {
       for (int i=0; i<2; i++) {
         assignLEDRange(0, 255, Color(100,0,0));
         display();
@@ -211,7 +209,6 @@ void loop() {        // while the arduino is powered on
         delay(50);
       }
     }
-    else Color(255,0,0);
 
     statusCol.setBrightness(5);
     
@@ -219,6 +216,8 @@ void loop() {        // while the arduino is powered on
       bars[b].setValue(level);
       bars[b].draw(statusCol);
     }
+
+    Serial.println(analogRead(MIC_PIN));
     tickAllBars();
     display();
     delay(10);
@@ -247,9 +246,15 @@ void processData() {
       if (modeSt == 0) modeSt = 1;
       else if (modeSt < 3) modeSt += 1;
     } else if (dataReceived[0] == '2') {
+<<<<<<< Updated upstream
       thresholdSt += 4;
     } else if (dataReceived[0] == '3') {
       thresholdSt -= 4;
+=======
+      thresholdSt += 2;
+    } else if (dataReceived[0] == '3') {
+      thresholdSt -= 2;
+>>>>>>> Stashed changes
     }
   }
   newData = false;
